@@ -1,17 +1,14 @@
 {
-  "name": "praatio",
+  "name": "praatio.ts",
   "version": "2.3.4",
-  "description": "A javascript library for working with praat, textgrids, time aligned audio transcripts, and audio files.",
+  "description": "TypeScript library for Praat textgrids, time aligned audio transcripts, and audio files.",
   "type": "module",
   "scripts": {
-    "linter": "eslint --ignore-path .gitignore ./lib ./test",
-    "test": "jest --config=./test/unit/jest.conf.cjs",
-    "coveralls": "cat ./test/unit/coverage/lcov.info | coveralls",
-    "docs": "jsdoc -d ./docs --readme ./README.md ./lib"
+    "build": "npx tsc"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/timmahrt/praatIO.js.git"
+    "url": "git+https://github.com/WangNianyi2001/praatio.ts.git"
   },
   "keywords": [
     "praat",
@@ -20,42 +17,21 @@
     "speech",
     "audio"
   ],
-  "author": "Tim Mahrt",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/timmahrt/praatIO.js/issues"
+    "url": "https://github.com/WangNianyi2001/praatio.ts/issues"
   },
-  "main": "/lib/index.js",
+  "main": "/dist/index.js",
   "files": [
     "/LICENSE",
-    "/README.md",
     "/lib"
   ],
-  "homepage": "https://github.com/timmahrt/praatIO.js#readme",
+  "homepage": "https://github.com/WangNianyi2001/praatio.ts",
   "devDependencies": {
-    "@babel/preset-env": "^7.12.11",
-    "babel-jest": "^26.6.3",
-    "coveralls": "^3.1.0",
-    "eslint": "^7.16.0",
-    "eslint-config-standard": "^16.0.2",
-    "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^5.0.0",
-    "jest": "^26.6.3",
-    "jest-matcher-deep-close-to": "^2.0.1",
-    "jsdoc": "^3.6.6"
+    "@types/node": "^18.7.16",
+    "typescript": "^4.8.2"
   },
   "dependencies": {
     "iconv-lite": "^0.6.3"
-  },
-  "babel": {
-    "env": {
-      "test": {
-        "presets": [
-          "@babel/preset-env"
-        ]
-      }
-    }
   }
 }

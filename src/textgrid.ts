@@ -1,104 +1,32 @@
-/**
- * This module contains the datastructures used for working with
- * Textgrids, IntervalTiers, and PointTiers, and the primary
- * functions used to operate over them.<br /><br />
- *
- * A Textgrid() is a container for annotation tiers. Annotation tiers
- * come in two varieties: IntervalTier and PointTier. With this library,
- * a textgrid can be queried, be used to filter data points, cleaned,
- * or algorithmically altered, etc.
- *
- * @author Nianyi Wang
- * @since September 8, 2022
- * @module textgrid
- */
-
 import {
 	isClose, sortCompareEntriesByTime, entryListToTree,
 	findIntervalAtTime, findPointAtTime, doIntervalsOverlap
-} from './utils.js';
+} from './utils';
 
-const INTERVAL_TIER = 'IntervalTier';
-const POINT_TIER = 'TextTier';
-const MIN_INTERVAL_LENGTH = 0.00000001; // Arbitrary threshold
+import {
+	TierExistsException,
+	TextgridCollisionException,
+	IndexException
+} from './exceptions';
 
-class TierExistsException extends Error {
-	readonly tierName: string;
+type Entry = [number, number, string];
 
-	constructor(tierName, ...args) {
-		super(...args);
-		this.tierName = tierName;
-		this.message = `Tier name ${tierName} already exists in textgrid`;
-	}
-};
-
-class TierCreationException extends Error {
-	readonly errStr: string
-
-	constructor(errStr, ...args) {
-		super(...args);
-		this.errStr = errStr;
-		this.message = "Couldn't create tier: " + errStr;
-	}
-};
-
-class TextgridCollisionException extends Error {
-	readonly tierName: string;
-	entry: any;
-	matchList: any;
-
-	constructor(tierName, entry, matchList, ...args) {
-		super(...args);
-		this.tierName = tierName;
-		this.entry = entry;
-		this.matchList = matchList;
-		this.message = `Attempted to insert interval [${entry}] into tier '${tierName}' of textgrid but overlapping entries [${matchList}] already exist.`;
-	}
-};
-
-class IndexException extends Error {
-	indexVal: number;
-	listLength: number;
-
-	constructor(indexVal, listLength, ...args) {
-		super(...args);
-		this.indexVal = indexVal;
-		this.listLength = listLength;
-		this.message = `Attempted to index a list of length ${listLength} with index ${indexVal}.`;
-	}
-};
-
-/**
- * Abstract class for tiers.
- * @abstract
- * @hideconstructor
- */
-class TextgridTier {
+abstract class Tier {
 	name: string;
-	entryList: any[];
+	entryList: Entry[];
 	minTimestamp: number;
 	maxTimestamp: number;
-	tierType: any;
 	labelIndex: number;
 
-	constructor(name, entryList, minT, maxT) {
-		// Don't allow a timeless tier to exist
-		if(minT === null || maxT === null)
-			throw new TierCreationException('All textgrid tiers must have a min and max timestamp');
-
+	constructor(name: string, entryList: Entry[], minT: number, maxT: number) {
 		this.name = name;
 		this.entryList = entryList;
 		this.minTimestamp = minT;
 		this.maxTimestamp = maxT;
-		this.tierType = null;
-		this.sort()
+		this.sort();
 	}
 
-	/**
-	 * Remove an entry from the tier's entryList
-	 * @param {Array} entry - the entry to remove
-	 */
-	deleteEntry(entry) {
+	deleteEntry(entry: Entry) {
 		let deleteI = -1;
 		for(let i = 0; i < this.entryList.length; i++) {
 			if(compareEntries(this.entryList[i], entry)) {
@@ -119,16 +47,7 @@ class TextgridTier {
 	}
 }
 
-/**
- * Class representing an PointTier.
- * @augments TextgridTier
- * @inheritdoc
- */
-class PointTier extends TextgridTier {
-	/**
-	 * @constructor
-	 * @param {Array} entryList - each entry is of the form [time, label]
-	 */
+class PointTier extends Tier {
 	constructor(name: string, entryList: any[], minT: number, maxT: number) {
 		entryList = entryList.map(([timeV, label]) => [parseFloat(timeV), label]);
 
@@ -142,17 +61,10 @@ class PointTier extends TextgridTier {
 
 		// Finish intialization
 		super(name, entryList, minT, maxT);
-		this.tierType = POINT_TIER;
 		this.labelIndex = 1;
 	}
 
-	/**
-	 * Insert an entry into the tier
-	 * @param {Array} entry - of the form [time, label]
-	 * @param {boolean} [warnFlag=true] - if the entry collides with an existing entry, warn the user?
-	 * @param {string} [collisionCode=null] - the action to take if there is a collision
-	 */
-	insertEntry(entry: any[], warnFlag: boolean = true, collisionCode: string = null) {
+	insertEntry(entry: Entry, warnFlag: boolean = true, collisionCode: string = null) {
 		const startTime = entry[0];
 
 		let match = null;
@@ -171,7 +83,7 @@ class PointTier extends TextgridTier {
 			this.entryList.push(entry);
 		}
 		else if(collisionCode && collisionCode.toLowerCase() === 'merge') {
-			const newEntry = [match[0], [match[1], entry[1]].join('-')];
+			const newEntry: Entry = [+match[0], +match[0], [match[1], entry[1]].join('-')];
 			this.deleteEntry(match);
 			this.entryList.push(newEntry);
 		}
@@ -190,9 +102,9 @@ class PointTier extends TextgridTier {
 
 /**
  * Class representing an IntervalTier.
- * @augments TextgridTier
+ * @augments Tier
  */
-class IntervalTier extends TextgridTier {
+class IntervalTier extends Tier {
 	/**
 	 * @constructor
 	 * @param {string} name
@@ -214,7 +126,6 @@ class IntervalTier extends TextgridTier {
 
 		// Finish initialization
 		super(name, entryList, minT, maxT);
-		this.tierType = INTERVAL_TIER;
 		this.labelIndex = 2;
 	}
 
@@ -224,7 +135,7 @@ class IntervalTier extends TextgridTier {
 	 * @param {boolean} [warnFlag=true] - if the entry collides with an existing entry, warn the user?
 	 * @param {string} [collisionCode=null] - the action to take if there is a collision
 	 */
-	insertEntry(entry, warnFlag = false, collisionCode = null) {
+	insertEntry(entry: Entry, warnFlag: boolean = false, collisionCode: string = null) {
 		const startTime = entry[0];
 		const endTime = entry[1];
 
@@ -250,11 +161,11 @@ class IntervalTier extends TextgridTier {
 			const endTimes = matchList.map(entry => entry[1]);
 			const labels = matchList.map(entry => entry[2]);
 
-			const newEntry = [
+			const newEntry: Entry = [
 				Math.min(...startTimes),
 				Math.max(...endTimes),
 				labels.join('-')
-			]
+			];
 
 			this.entryList.push(newEntry);
 		}
@@ -281,7 +192,7 @@ class IntervalTier extends TextgridTier {
  * A Textgrid allows one to compute operations that affect
  * all of the contained tiers.
  */
-class Textgrid {
+class TextGrid {
 	tierNameList: string[];
 	tierDict: any;
 	minTimestamp: number;
@@ -297,7 +208,7 @@ class Textgrid {
 
 	/**
 	 * Adds a tier to the textgrid.  Added to the end, unless an index is specified.
-	 * @param {TextgridTier} tier
+	 * @param {Tier} tier
 	 * @param {number} [tierIndex=null] - The index to insert at.  If null, add it to the end.
 	 */
 	addTier(tier, tierIndex = null) {
@@ -373,7 +284,7 @@ class Textgrid {
 	/**
 	 * Replace the tier with the given name with a new tier
 	 * @param {string} name
-	 * @param {TextgridTier} newTier
+	 * @param {Tier} newTier
 	 */
 	replaceTier(name, newTier) {
 		const tierIndex = this.tierNameList.indexOf(name);
@@ -384,8 +295,8 @@ class Textgrid {
 
 /**
  * Returns true if the two textgrids are the same, false otherwise
- * @param {Textgrid} tg1
- * @param {Textgrid} tg2
+ * @param {TextGrid} tg1
+ * @param {TextGrid} tg2
  * @return {boolean}
  */
 function compareTextgrids(tg1, tg2) {
@@ -407,8 +318,8 @@ function compareTextgrids(tg1, tg2) {
 
 /**
  * Returns true if the two tiers are the same, false otherwise
- * @param {TextgridTier} tier1
- * @param {TextgridTier} tier2
+ * @param {Tier} tier1
+ * @param {Tier} tier2
  * @return {boolean}
  */
 function compareTiers(tier1, tier2) {
@@ -440,7 +351,7 @@ function compareEntries(entryA, entryB) {
 	} else if(entryA.length === 3) {
 		areEqual = compareIntervals(entryA, entryB);
 	}
-	return areEqual
+	return areEqual;
 }
 
 function comparePoints(pointA, pointB) {
@@ -455,16 +366,16 @@ function compareIntervals(intervalA, intervalB) {
 	areEqual &&= isClose(intervalA[0], intervalB[0]);
 	areEqual &&= isClose(intervalA[1], intervalB[1]);
 	areEqual &&= intervalA[2] === intervalB[2];
-	return !!areEqual
+	return !!areEqual;
 }
 
 /**
  * Returns a deep copy of a textgrid.
- * @param {Textgrid} tg
- * @return {Textgrid}
+ * @param {TextGrid} tg
+ * @return {TextGrid}
  */
 function copyTextgrid(tg) {
-	const textgrid = new Textgrid();
+	const textgrid = new TextGrid();
 	for(let i = 0; i < tg.tierNameList.length; i++) {
 		const tierName = tg.tierNameList[i];
 		textgrid.addTier(copyTier(tg.tierDict[tierName]));
@@ -478,9 +389,9 @@ function copyTextgrid(tg) {
 
 /**
  * Returns a deep copy of a tier
- * @param {TextgridTier} tier
+ * @param {Tier} tier
  * @param {Object} - an object containing optional values to replace those in the copy.  If the four paramaters name, entryList, minTimestamp, and maxTimestamp are null or not specified, those in the tier will be used (default behaviour).
- * @return {TextgridTier}
+ * @return {Tier}
  */
 function copyTier(tier, {
 	name = null,
@@ -545,7 +456,7 @@ function getValuesInIntervals(intervalTier, dataTupleList) {
  * @return {Array} entryList
  */
 function getEntriesInInterval(tier, startTime, endTime) {
-	let entryList
+	let entryList;
 	if(tier instanceof PointTier) {
 		entryList = getPointTierEntriesInInterval(tier, startTime, endTime);
 	}
@@ -618,13 +529,13 @@ function getNonEntriesFromIntervalTier(intervalTier) {
 function findLabelInTier(tier, searchLabel, mode = null) {
 	let cmprFunc;
 	if(mode === 're') {
-		cmprFunc = (text, reStr) => { return RegExp(reStr).test(text) };
+		cmprFunc = (text, reStr) => { return RegExp(reStr).test(text); };
 	}
 	else if(mode === 'substr') {
-		cmprFunc = (text, subStr) => { return text.includes(subStr) };
+		cmprFunc = (text, subStr) => { return text.includes(subStr); };
 	}
 	else {
-		cmprFunc = (text, searchText) => { return text === searchText };
+		cmprFunc = (text, searchText) => { return text === searchText; };
 	}
 
 	// Run the search
@@ -636,7 +547,7 @@ function findLabelInTier(tier, searchLabel, mode = null) {
 }
 
 export {
-	Textgrid, IntervalTier, PointTier,
+	TextGrid, Tier, IntervalTier, PointTier,
 	// functions that compare
 	compareTextgrids, compareTiers, compareEntries,
 	comparePoints, compareIntervals,
@@ -644,10 +555,5 @@ export {
 	copyTextgrid, copyTier,
 	// query functions
 	getValuesAtPoints, getValuesInIntervals, getEntriesInInterval,
-	getNonEntriesFromIntervalTier, findLabelInTier,
-	// exceptions
-	TierExistsException, TierCreationException, TextgridCollisionException,
-	IndexException,
-	// constants
-	INTERVAL_TIER, POINT_TIER, MIN_INTERVAL_LENGTH
+	getNonEntriesFromIntervalTier, findLabelInTier
 };

@@ -1,5 +1,5 @@
 import {
-	Textgrid, IntervalTier, PointTier,
+	TextGrid, IntervalTier, PointTier,
 	// functions that compare
 	compareTextgrids, compareTiers, compareEntries,
 	comparePoints, compareIntervals,
@@ -7,13 +7,8 @@ import {
 	copyTextgrid, copyTier,
 	// query functions
 	getValuesAtPoints, getValuesInIntervals, getEntriesInInterval,
-	getNonEntriesFromIntervalTier, findLabelInTier,
-	// exceptions
-	TierExistsException, TierCreationException, TextgridCollisionException,
-	IndexException,
-	// constants
-	INTERVAL_TIER, POINT_TIER, MIN_INTERVAL_LENGTH
-} from './textgrid.js';
+	getNonEntriesFromIntervalTier, findLabelInTier
+} from './textgrid';
 
 import {
 	// functions that modify
@@ -24,22 +19,20 @@ import {
 	insertSpaceIntoTextgrid, insertSpaceIntoTier,
 	mergeTextgridTiers,
 	takeTierUnion, takeIntervalTierDifference, takeIntervalTierIntersection,
-	// exceptions
-	NonMatchingTiersException, OvershootModificationException, IncorrectArgumentException
-} from './textgrid_modifiers.js';
+} from './textgrid_modifiers';
 
 import {
 	parseTextgrid, serializeTextgrid, serializeTextgridToCsv, decodeBuffer,
 	prepTgForSaving
-} from './textgrid_io.js';
+} from './textgrid_io';
 
 import {
 	doIntervalsOverlap, isClose, sortCompareEntriesByTime,
 	entryListToTree, findIntervalAtTime, findPointAtTime
-} from './utils.js';
+} from './utils';
 
 export {
-	Textgrid, IntervalTier, PointTier,
+	TextGrid, IntervalTier, PointTier,
 	// functions that modify
 	appendTextgrid, appendTier,
 	cropTextgrid, cropTier,
@@ -56,12 +49,6 @@ export {
 	// query functions
 	getValuesAtPoints, getValuesInIntervals, getEntriesInInterval,
 	getNonEntriesFromIntervalTier, findLabelInTier,
-	// exceptions
-	TierExistsException, TierCreationException, TextgridCollisionException,
-	IndexException,
-	NonMatchingTiersException, OvershootModificationException, IncorrectArgumentException,
-	// constants
-	INTERVAL_TIER, POINT_TIER, MIN_INTERVAL_LENGTH,
 	// from textgrid_io
 	parseTextgrid, serializeTextgrid, serializeTextgridToCsv, decodeBuffer,
 	prepTgForSaving,

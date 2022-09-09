@@ -1,5 +1,3 @@
-import { TextGrid, IntervalTier, PointTier, compareTextgrids, compareTiers, compareEntries, comparePoints, compareIntervals, copyTextgrid, copyTier, getValuesAtPoints, getValuesInIntervals, getEntriesInInterval, getNonEntriesFromIntervalTier, findLabelInTier } from './textgrid';
-import { appendTextgrid, appendTier, cropTextgrid, cropTier, editTextgridTimestamps, editTierTimestamps, eraseRegionFromTextgrid, eraseRegionFromTier, insertSpaceIntoTextgrid, insertSpaceIntoTier, mergeTextgridTiers, takeTierUnion, takeIntervalTierDifference, takeIntervalTierIntersection } from './textgrid_modifiers';
-import { parseTextgrid, serializeTextgrid, serializeTextgridToCsv, decodeBuffer, prepTgForSaving } from './textgrid_io';
-import { doIntervalsOverlap, isClose, sortCompareEntriesByTime, entryListToTree, findIntervalAtTime, findPointAtTime } from './utils';
-export { TextGrid, IntervalTier, PointTier, appendTextgrid, appendTier, cropTextgrid, cropTier, editTextgridTimestamps, editTierTimestamps, eraseRegionFromTextgrid, eraseRegionFromTier, insertSpaceIntoTextgrid, insertSpaceIntoTier, mergeTextgridTiers, takeTierUnion, takeIntervalTierDifference, takeIntervalTierIntersection, compareTextgrids, compareTiers, compareEntries, comparePoints, compareIntervals, copyTextgrid, copyTier, getValuesAtPoints, getValuesInIntervals, getEntriesInInterval, getNonEntriesFromIntervalTier, findLabelInTier, parseTextgrid, serializeTextgrid, serializeTextgridToCsv, decodeBuffer, prepTgForSaving, doIntervalsOverlap, isClose, sortCompareEntriesByTime, entryListToTree, findIntervalAtTime, findPointAtTime };
+export { default as TextGrid } from './textgrid';
+export { default as IntervalTier } from './tiers/interval';
+export { default as PointTier } from './tiers/point';

@@ -1,24 +1,3 @@
-export declare class TierExistsException extends Error {
-    readonly tierName: string;
-    constructor(tierName: any, ...args: any[]);
-}
-export declare class TierCreationException extends Error {
-    readonly errStr: string;
-    constructor(errStr: any, ...args: any[]);
-}
-export declare class TextgridCollisionException extends Error {
-    readonly tierName: string;
-    entry: any;
-    matchList: any;
-    constructor(tierName: any, entry: any, matchList: any, ...args: any[]);
-}
-export declare class IndexException extends Error {
-    indexVal: number;
-    listLength: number;
-    constructor(indexVal: any, listLength: any, ...args: any[]);
-}
-export declare class NonMatchingTiersException extends Error {
-}
 export declare class OvershootModificationException extends Error {
     tierName: string;
     oldEntry: any;

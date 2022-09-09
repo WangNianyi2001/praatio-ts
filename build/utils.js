@@ -1,6 +1,6 @@
 import TextGrid from './textgrid.js';
-import { IntervalTier } from './tiers/interval.js';
-import { PointTier } from './tiers/point.js';
+import { Interval, IntervalTier } from './tiers/interval.js';
+import { Point, PointTier } from './tiers/point.js';
 function split(str, separator, max = 0) {
     const out = [];
     let index = 0;
@@ -69,19 +69,18 @@ function parseNormalTextgrid(data) {
             .trim()
             .slice(1, -1);
         // Get the tier entry list
-        const denotations = [];
         let labelI = 0;
         let label = null;
         let tier = null;
         switch (tierType) {
             default:
-                console.error(header);
-                throw 'Auuugh no';
-            case 'IntervalTier':
+                console.error(`Unsupported tier type ${tierType}`);
+            case 'IntervalTier': {
                 let timeStartI = null;
                 let timeEndI = null;
                 let timeStart = null;
                 let timeEnd = null;
+                const intervals = [];
                 while (true) {
                     [timeStart, timeStartI] = fetchRow(tierData, 'xmin = ', labelI);
                     // Break condition here.  indexof loops around at the end of a file
@@ -90,13 +89,15 @@ function parseNormalTextgrid(data) {
                     [timeEnd, timeEndI] = fetchRow(tierData, 'xmax = ', timeStartI);
                     [label, labelI] = fetchRow(tierData, 'text =', timeEndI);
                     label = label.trim();
-                    denotations.push([timeStart, timeEnd, label]);
+                    intervals.push(new Interval(label, +timeStart, +timeEnd));
                 }
-                tier = new IntervalTier(tierName, denotations);
+                tier = new IntervalTier(tierName, intervals);
                 break;
-            case 'PointTier':
+            }
+            case 'PointTier': {
                 let timePointI = null;
                 let timePoint = null;
+                const points = [];
                 while (true) {
                     [timePoint, timePointI] = fetchRow(tierData, 'number = ', labelI);
                     // Break condition here.  indexof loops around at the end of a file
@@ -104,10 +105,11 @@ function parseNormalTextgrid(data) {
                         break;
                     [label, labelI] = fetchRow(tierData, 'mark =', timePointI);
                     label = label.trim();
-                    denotations.push([timePoint, label]);
+                    points.push(new Point(label, +timePoint));
                 }
-                tier = new PointTier(tierName, denotations);
+                tier = new PointTier(tierName, points);
                 break;
+            }
         }
         textgrid.Add(tier);
     }
@@ -128,7 +130,7 @@ function parseShortTextgrid(data) {
         return x[0] - y[0];
     });
     const tupleList = [];
-    for (let i = 0; i < indexList.length - 1; i++) {
+    for (let i = 0; i < indexList.length - 1; ++i) {
         tupleList.push([indexList[i][0], indexList[i + 1][0], indexList[i][1]]);
     }
     // Add the textgrid tiers
@@ -186,8 +188,8 @@ function serializeTextgrid(tg) {
     // File header
     outputTxt += 'File type = "ooTextFile"\n';
     outputTxt += 'Object class = "TextGrid"\n\n';
-    outputTxt += `xmin = ${tg.start} \n`;
-    outputTxt += `xmax = ${tg.end} \n`;
+    outputTxt += `xmin = ${0} \n`;
+    outputTxt += `xmax = ${tg.span} \n`;
     outputTxt += 'tiers? <exists> \n';
     outputTxt += `size = ${tg.tierNames.length} \n`;
     outputTxt += 'item []: \n';
@@ -196,25 +198,25 @@ function serializeTextgrid(tg) {
         outputTxt += tab + `item [${i + 1}]:\n`;
         outputTxt += tab.repeat(2) + `class = "${tier.constructor.name}" \n`;
         outputTxt += tab.repeat(2) + `name = "${tier.name}" \n`;
-        outputTxt += tab.repeat(2) + `xmin = ${tg.start} \n`;
-        outputTxt += tab.repeat(2) + `xmax = ${tg.end} \n`;
+        outputTxt += tab.repeat(2) + `xmin = ${0} \n`;
+        outputTxt += tab.repeat(2) + `xmax = ${tg.span} \n`;
         switch (true) {
             case tier instanceof IntervalTier:
                 outputTxt += tab.repeat(2) + `intervals: size = ${tier.denotations.length} \n`;
                 for (let j = 0; j < tier.denotations.length; j++) {
-                    const [start, stop, label] = tier.denotations[j];
+                    const { start, end, label } = tier.denotations[j];
                     outputTxt += tab.repeat(2) + `intervals [${j + 1}]:\n`;
                     outputTxt += tab.repeat(3) + `xmin = ${start} \n`;
-                    outputTxt += tab.repeat(3) + `xmax = ${stop} \n`;
+                    outputTxt += tab.repeat(3) + `xmax = ${end} \n`;
                     outputTxt += tab.repeat(3) + `text = "${label}" \n`;
                 }
                 break;
             case tier instanceof PointTier:
                 outputTxt += tab.repeat(2) + `points: size = ${tier.denotations.length} \n`;
                 for (let j = 0; j < tier.denotations.length; j++) {
-                    const [timestamp, label] = tier.denotations[j];
+                    const { time, label } = tier.denotations[j];
                     outputTxt += tab.repeat(2) + `points [${j + 1}]:\n`;
-                    outputTxt += tab.repeat(3) + `number = ${timestamp} \n`;
+                    outputTxt += tab.repeat(3) + `number = ${time} \n`;
                     outputTxt += tab.repeat(3) + `mark = "${label}" \n`;
                 }
                 break;
@@ -224,7 +226,6 @@ function serializeTextgrid(tg) {
 }
 function parseTextgrid(text) {
     text = text.replace(/\r\n/g, '\n');
-    let textgrid;
     const caseA = text.indexOf('ooTextFile short') > -1; // 'short' in header
     const caseB = text.indexOf('item [') === -1; // 'item' keyword not in file
     return (caseA || caseB ? parseShortTextgrid : parseNormalTextgrid)(text);

@@ -1,6 +1,6 @@
-import Range from '../range.js';
+import { RangeBase } from '../range.js';
 import Tier from '../tier.js';
-export declare class Point extends Range<Point> {
+export declare class Point extends RangeBase<Point> {
     label: string;
     time: number;
     get start(): number;
@@ -10,9 +10,8 @@ export declare class Point extends Range<Point> {
     constructor(label: string, time: number);
     Copy(): Point;
 }
-export default class PointTier extends Tier<Point, PointTier> {
+export default class PointTier extends Tier<Point> {
     get points(): import("../track.js").default<Point>;
-    constructor(name: string, points?: Iterable<Point>);
     Copy(): PointTier;
 }
 export { PointTier };

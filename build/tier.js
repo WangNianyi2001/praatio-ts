@@ -1,17 +1,12 @@
-import Range from './range.js';
 import Track from './track.js';
-export default class Tier extends Range {
+export default class Tier {
     name;
     denotations = new Track();
     textgrid;
-    get start() {
-        return 0;
-    }
-    get end() {
-        return this.textgrid ? this.textgrid.end : Infinity;
+    get span() {
+        return this.textgrid ? this.textgrid.span : Infinity;
     }
     constructor(name, denotations) {
-        super();
         this.name = name;
         this.denotations = new Track(denotations);
     }

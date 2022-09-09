@@ -1,12 +1,12 @@
 import Tier from './tier.js';
 import { Readable } from 'stream';
 import { parseTextgrid, serializeTextgrid } from './utils.js';
+import { IRange } from './range.js';
 
 export default class TextGrid {
-	tierDict = new Map<string, Tier<any, any>>();
+	tierDict = new Map<string, Tier<IRange<any>>>();
 
-	get start(): number { return 0; }
-	get end(): number {
+	get span(): number {
 		return Math.max(0, ...this.tiers.map(tier => tier.denotations.span));
 	}
 
@@ -27,7 +27,7 @@ export default class TextGrid {
 		return serializeTextgrid(this);
 	}
 
-	Add(tier: Tier<any, any>) {
+	Add(tier: Tier<any>) {
 		if(this.tierDict.has(tier.name)) {
 			console.warn(`Tier "${tier.name}" already exists, skipping adding new tier`);
 			return;

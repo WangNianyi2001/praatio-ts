@@ -1,8 +1,7 @@
 import { parseTextgrid, serializeTextgrid } from './utils.js';
 export default class TextGrid {
     tierDict = new Map();
-    get start() { return 0; }
-    get end() {
+    get span() {
         return Math.max(0, ...this.tiers.map(tier => tier.denotations.span));
     }
     get tiers() { return [...this.tierDict.values()]; }

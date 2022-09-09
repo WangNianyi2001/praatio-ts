@@ -1,6 +1,6 @@
-import Range from '../range.js';
+import { RangeBase } from '../range.js';
 import Tier from '../tier.js';
-export class Interval extends Range {
+export class Interval extends RangeBase {
     label;
     start;
     end;
@@ -16,9 +16,6 @@ export class Interval extends Range {
 }
 export default class IntervalTier extends Tier {
     get intervals() { return this.denotations; }
-    constructor(name, intervals) {
-        super(name, intervals);
-    }
     Copy() {
         const copy = new IntervalTier(this.name, this.intervals.Copy());
         return copy;

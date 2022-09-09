@@ -1,6 +1,6 @@
-import Range from './range.js';
+import { IRange, RangeBase, Range, Includes, IsWithIn } from './range.js';
 
-export default class Track<R extends Range<any>> extends Array<R> {
+export default class Track<R extends RangeBase<any>> extends Array<R> {
 	get empty(): boolean {
 		return this.length > 0;
 	}
@@ -10,64 +10,97 @@ export default class Track<R extends Range<any>> extends Array<R> {
 
 	constructor(array?: Iterable<R>) {
 		super();
-		if(!array || !(Symbol.iterator in array))
+		if(!array)
 			return;
 		this.push(...array);
 	}
 	Copy(): Track<R> {
 		return new Track<R>(this.map(range => range.Copy()));
 	}
+	slice(): Array<R> {
+		return Array.from(this).slice(...arguments);
+	}
 
 	IndexOf(denotation: R): number {
 		return this.indexOf(denotation);
 	}
+	At(time: number): R | null {
+		return this.First(range => range.Includes(new Range(time, time)));
+	}
+	AtIndex(index: number): R | null {
+		if(
+			index < 0 || index >= this.length ||
+			Math.floor(index) != index
+		) return null;
+		return this[index];
+	}
 
-	*YieldIncluding(start: number, end: number): Generator<[number, R]> {
-		for(const [i, entry] of this.entries()) {
-			if(entry.start <= start && entry.end >= end)
-				yield [i, entry];
+	*Yield(predicate: (range: IRange<any>) => boolean): Generator<[number, R]> {
+		for(let index = 0; index < this.length; ++index) {
+			const range = this[index];
+			if(predicate(range))
+				yield [index, range];
 		}
 	}
-	*YieldWithIn(start: number, end: number): Generator<[number, R]> {
-		for(const [i, entry] of this.entries()) {
-			if(entry.start >= start && entry.end <= end)
-				yield [i, entry];
+	*ReverseYield(predicate: (range: IRange<any>) => boolean): Generator<[number, R]> {
+		for(let index = this.length - 1; index > 0; ) {
+			--index;
+			const range = this[index];
+			if(predicate(range))
+				yield [index, range];
 		}
 	}
-
-	FirstIncluding(start: number, end: number): R | null {
-		const it = this.YieldIncluding(start, end).next();
+	First(predicate: (range: IRange<any>) => boolean): R | null {
+		const it = this.Yield(predicate).next();
 		return it.done ? null : it.value[1];
 	}
-	FirstWithIn(start: number, end: number): R | null {
-		const it = this.YieldWithIn(start, end).next();
+	Last(predicate: (range: IRange<any>) => boolean): R | null {
+		const it = this.ReverseYield(predicate).next();
 		return it.done ? null : it.value[1];
 	}
-
-	HasIncluding(start: number, end: number): boolean {
-		return !this.YieldIncluding(start, end).next().done;
-	}
-	HasWithIn(start: number, end: number): boolean {
-		return !this.YieldWithIn(start, end).next().done;
+	Any(predicate: (range: IRange<any>) => boolean): boolean {
+		return !this.Yield(predicate).next().done;
 	}
 
-	Insert(denotation: R): number {
-		if(!this.HasIncluding(denotation.start, denotation.end))
+	Insert(range: R): number {
+		if(!this.Any(Includes(new Range(range.start, range.end))))
 			return -1;
 		if(this.empty) {
-			this.push(denotation);
+			this.push(range);
 			return 0;
 		}
-		const it = this.YieldWithIn(denotation.end, this.span).next();
+		const it = this.Yield(IsWithIn(new Range(range.end, this.span))).next();
 		const index = (it.done ? this.length : it.value[0]) - 1;
-		this.splice(index, 0, denotation);
+		this.splice(index, 0, range);
 		return index;
 	}
-	Remove(denotation: R): number {
-		const index = this.IndexOf(denotation);
+	Remove(range: R): number {
+		const index = this.IndexOf(range);
 		if(index === -1)
 			return -1;
 		this.splice(index, 1);
 		return index;
+	}
+	Adjust(range: R, target: IRange<any>): boolean {
+		if(this.Any(obj => obj !== range && obj.Overlaps(target)))
+			return false;
+		[range.start, range.end] = [target.start, target.end];
+		return true;
+	}
+	AdjustAdjacent(left: R, right: R, time: number): boolean {
+		const [leftRetract, rightRetract] = [
+			left.end > time, right.start < time
+		];
+		// First retract
+		if(
+			(leftRetract && !this.Adjust(left, new Range(left.start, time))) ||
+			(rightRetract && !this.Adjust(left, new Range(time, right.end)))
+		) return false;
+		// Then expand
+		if(
+			(!leftRetract && !this.Adjust(left, new Range(left.start, time))) ||
+			(!rightRetract && !this.Adjust(right, new Range(time, right.end)))
+		) return false;
+		return true;
 	}
 }

@@ -219,7 +219,7 @@ function parseShortTextgrid(data: string): TextGrid | null {
 }
 
 function serializeTextgrid(tg: TextGrid): string {
-	const tab = ' '.repeat(4);
+	const tab = '\t';
 
 	let outputTxt = '';
 
@@ -232,9 +232,10 @@ function serializeTextgrid(tg: TextGrid): string {
 	outputTxt += `size = ${tg.tierNames.length} \n`;
 	outputTxt += 'item []: \n';
 
-	for(const [i, tier] of tg.tierDict.entries()) {
+	let i = 0;
+	for(const tier of tg.tierDict.values()) {
 		// Interval header
-		outputTxt += tab + `item [${i + 1}]:\n`;
+		outputTxt += tab + `item [${++i}]:\n`;
 		outputTxt += tab.repeat(2) + `class = "${tier.constructor.name}" \n`;
 		outputTxt += tab.repeat(2) + `name = "${tier.name}" \n`;
 		outputTxt += tab.repeat(2) + `xmin = ${0} \n`;

@@ -2,7 +2,7 @@ import { IRange, RangeBase, Range, Includes, IsWithIn } from './range.js';
 
 export default class Track<R extends RangeBase<any>> extends Array<R> {
 	get empty(): boolean {
-		return this.length > 0;
+		return !(this.length > 0);
 	}
 	get span(): number {
 		return this.empty ? 0 : this[this.length - 1].end;

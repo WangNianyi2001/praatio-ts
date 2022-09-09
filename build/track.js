@@ -1,7 +1,7 @@
 import { Range, Includes, IsWithIn } from './range.js';
 export default class Track extends Array {
     get empty() {
-        return this.length > 0;
+        return !(this.length > 0);
     }
     get span() {
         return this.empty ? 0 : this[this.length - 1].end;

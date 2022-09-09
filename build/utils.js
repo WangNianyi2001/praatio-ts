@@ -180,25 +180,47 @@ function parseShortTextgrid(data) {
     }
     return textgrid;
 }
-function tierToText(tier) {
-    let text = '';
-    text += `"${tier.name}"\n`;
-    text += `${tier.start}\n${tier.end}\n`;
-    text += `${tier.denotations.length}\n`;
-    for (let i = 0; i < tier.denotations.length; i++) {
-        let entry = tier.denotations[i];
-        text += entry.join('\n') + '\n';
-    }
-    return text;
-}
 function serializeTextgrid(tg) {
-    return [
-        'File type = "ooTextFile"',
-        'Object class = "TextGrid"\n',
-        `${tg.start}\n${tg.end}`,
-        `<exists>\n${tg.tierNames.length}`,
-        tg.tierNames.map(name => tierToText(tg.tierDict.get(name))),
-    ].join('\n');
+    const tab = ' '.repeat(4);
+    let outputTxt = '';
+    // File header
+    outputTxt += 'File type = "ooTextFile"\n';
+    outputTxt += 'Object class = "TextGrid"\n\n';
+    outputTxt += `xmin = ${tg.start} \n`;
+    outputTxt += `xmax = ${tg.end} \n`;
+    outputTxt += 'tiers? <exists> \n';
+    outputTxt += `size = ${tg.tierNames.length} \n`;
+    outputTxt += 'item []: \n';
+    for (const [i, tier] of tg.tierDict.entries()) {
+        // Interval header
+        outputTxt += tab + `item [${i + 1}]:\n`;
+        outputTxt += tab.repeat(2) + `class = "${tier.constructor.name}" \n`;
+        outputTxt += tab.repeat(2) + `name = "${tier.name}" \n`;
+        outputTxt += tab.repeat(2) + `xmin = ${tg.start} \n`;
+        outputTxt += tab.repeat(2) + `xmax = ${tg.end} \n`;
+        switch (true) {
+            case tier instanceof IntervalTier:
+                outputTxt += tab.repeat(2) + `intervals: size = ${tier.denotations.length} \n`;
+                for (let j = 0; j < tier.denotations.length; j++) {
+                    const [start, stop, label] = tier.denotations[j];
+                    outputTxt += tab.repeat(2) + `intervals [${j + 1}]:\n`;
+                    outputTxt += tab.repeat(3) + `xmin = ${start} \n`;
+                    outputTxt += tab.repeat(3) + `xmax = ${stop} \n`;
+                    outputTxt += tab.repeat(3) + `text = "${label}" \n`;
+                }
+                break;
+            case tier instanceof PointTier:
+                outputTxt += tab.repeat(2) + `points: size = ${tier.denotations.length} \n`;
+                for (let j = 0; j < tier.denotations.length; j++) {
+                    const [timestamp, label] = tier.denotations[j];
+                    outputTxt += tab.repeat(2) + `points [${j + 1}]:\n`;
+                    outputTxt += tab.repeat(3) + `number = ${timestamp} \n`;
+                    outputTxt += tab.repeat(3) + `mark = "${label}" \n`;
+                }
+                break;
+        }
+    }
+    return outputTxt;
 }
 function parseTextgrid(text) {
     text = text.replace(/\r\n/g, '\n');

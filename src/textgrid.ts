@@ -7,7 +7,6 @@ export default class TextGrid {
 	tierDict = new Map<string, Tier<IRange<any>>>();
 
 	get span(): number {
-		console.log(this.tiers.map(tier => tier.denotations.span));
 		return Math.max(0, ...this.tiers.map(tier => tier.denotations.span));
 	}
 

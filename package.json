@@ -4,9 +4,7 @@
   "description": "TypeScript library for Praat textgrids, time aligned audio transcripts, and audio files.",
   "type": "module",
   "scripts": {
-    "build": "npx tsc",
-    "test": "node test/index.js",
-    "bt": "npm run build && npm run test"
+    "build": "npx tsc"
   },
   "repository": {
     "type": "git",

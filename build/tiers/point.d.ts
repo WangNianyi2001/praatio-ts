@@ -12,6 +12,7 @@ export declare class Point extends RangeBase<Point> {
 }
 export default class PointTier extends Tier<Point> {
     get points(): import("../track.js").default<Point>;
+    get type(): string;
     Copy(): PointTier;
 }
 export { PointTier };

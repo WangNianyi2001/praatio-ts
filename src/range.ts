@@ -1,6 +1,7 @@
 export interface IRange<Impl extends RangeBase<Impl>> {
 	start: number;
 	end: number;
+	get length(): number;
 
 	get range(): Range;
 	Copy(): Impl;
@@ -25,6 +26,9 @@ export abstract class RangeBase<Impl extends RangeBase<Impl>> implements IRange<
 	abstract set start(value: number);
 	abstract get end(): number;
 	abstract set end(value: number);
+	get length(): number {
+		return this.end - this.start;
+	}
 
 	get range(): Range {
 		return new Range(this.start, this.end);

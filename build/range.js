@@ -3,6 +3,9 @@ export const Overlaps = (range) => (target) => (target.start < range.end && targ
     (range.start < target.end && range.end > target.start);
 export const Includes = (range) => (target) => target.start <= range.start && target.end >= range.end;
 export class RangeBase {
+    get length() {
+        return this.end - this.start;
+    }
     get range() {
         return new Range(this.start, this.end);
     }

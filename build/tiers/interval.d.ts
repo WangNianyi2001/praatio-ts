@@ -9,6 +9,7 @@ export declare class Interval extends RangeBase<Interval> {
 }
 export default class IntervalTier extends Tier<Interval> {
     get intervals(): import("../track.js").default<Interval>;
+    get type(): string;
     Copy(): IntervalTier;
 }
 export { IntervalTier };

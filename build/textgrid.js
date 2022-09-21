@@ -1,11 +1,9 @@
 import { parseTextgrid, serializeTextgrid } from './utils.js';
 export default class TextGrid {
-    tierDict = new Map();
+    tiers = new Map();
     get span() {
-        return Math.max(0, ...this.tiers.map(tier => tier.denotations.span));
+        return Math.max(0, ...[...this.tiers.values()].map(tier => tier.ranges.span));
     }
-    get tiers() { return [...this.tierDict.values()]; }
-    get tierNames() { return this.tiers.map(tier => tier.name); }
     static FromString(str) {
         return parseTextgrid(str);
     }
@@ -18,12 +16,11 @@ export default class TextGrid {
     Serialize() {
         return serializeTextgrid(this);
     }
-    Add(tier) {
-        if (this.tierDict.has(tier.name)) {
-            console.warn(`Tier "${tier.name}" already exists, skipping adding new tier`);
-            return;
-        }
-        this.tierDict.set(tier.name, tier);
+    Add(tier, force = false) {
+        if (!force && this.tiers.has(tier.name))
+            return false;
+        this.tiers.set(tier.name, tier);
         tier.textgrid = this;
+        return true;
     }
 }

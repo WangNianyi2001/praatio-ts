@@ -229,11 +229,11 @@ function serializeTextgrid(tg: TextGrid): string {
 	outputTxt += `xmin = ${0} \n`;
 	outputTxt += `xmax = ${tg.span} \n`;
 	outputTxt += 'tiers? <exists> \n';
-	outputTxt += `size = ${tg.tierNames.length} \n`;
+	outputTxt += `size = ${tg.tiers.size} \n`;
 	outputTxt += 'item []: \n';
 
 	let i = 0;
-	for(const tier of tg.tierDict.values()) {
+	for(const tier of tg.tiers.values()) {
 		// Interval header
 		outputTxt += tab + `item [${++i}]:\n`;
 		outputTxt += tab.repeat(2) + `class = "${tier.constructor.name}" \n`;
@@ -243,9 +243,9 @@ function serializeTextgrid(tg: TextGrid): string {
 
 		switch(true) {
 			case tier instanceof IntervalTier:
-				outputTxt += tab.repeat(2) + `intervals: size = ${tier.denotations.length} \n`;
-				for(let j = 0; j < tier.denotations.length; j++) {
-					const { start, end, label } = tier.denotations[j] as Interval;
+				outputTxt += tab.repeat(2) + `intervals: size = ${tier.ranges.length} \n`;
+				for(let j = 0; j < tier.ranges.length; j++) {
+					const { start, end, label } = tier.ranges[j] as Interval;
 					outputTxt += tab.repeat(2) + `intervals [${j + 1}]:\n`;
 					outputTxt += tab.repeat(3) + `xmin = ${start} \n`;
 					outputTxt += tab.repeat(3) + `xmax = ${end} \n`;
@@ -253,9 +253,9 @@ function serializeTextgrid(tg: TextGrid): string {
 				}
 				break;
 			case tier instanceof PointTier:
-				outputTxt += tab.repeat(2) + `points: size = ${tier.denotations.length} \n`;
-				for(let j = 0; j < tier.denotations.length; j++) {
-					const { time, label } = tier.denotations[j] as Point;
+				outputTxt += tab.repeat(2) + `points: size = ${tier.ranges.length} \n`;
+				for(let j = 0; j < tier.ranges.length; j++) {
+					const { time, label } = tier.ranges[j] as Point;
 					outputTxt += tab.repeat(2) + `points [${j + 1}]:\n`;
 					outputTxt += tab.repeat(3) + `number = ${time} \n`;
 					outputTxt += tab.repeat(3) + `mark = "${label}" \n`;

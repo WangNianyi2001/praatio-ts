@@ -1,6 +1,7 @@
 export interface IRange<Impl extends RangeBase<Impl>> {
     start: number;
     end: number;
+    get length(): number;
     get range(): Range;
     Copy(): Impl;
     IsWithIn(range: IRange<any>): boolean;
@@ -15,6 +16,7 @@ export declare abstract class RangeBase<Impl extends RangeBase<Impl>> implements
     abstract set start(value: number);
     abstract get end(): number;
     abstract set end(value: number);
+    get length(): number;
     get range(): Range;
     abstract Copy(): Impl;
     IsWithIn(range: IRange<any>): boolean;

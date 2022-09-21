@@ -1,7 +1,7 @@
 import { IRange, RangeBase } from './range.js';
 export default class Track<R extends RangeBase<any>> extends Array<R> {
     get empty(): boolean;
-    get span(): number;
+    get length(): number;
     constructor(array?: Iterable<R>);
     Copy(): Track<R>;
     slice(): Array<R>;

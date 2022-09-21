@@ -6,8 +6,8 @@ import { IRange } from './range.js';
 export default class TextGrid {
 	tiers = new Map<string, Tier<IRange<any>>>();
 
-	get span(): number {
-		return Math.max(0, ...[...this.tiers.values()].map(tier => tier.ranges.span));
+	get length(): number {
+		return Math.max(0, ...[...this.tiers.values()].map(tier => tier.ranges.length));
 	}
 
 	static FromString(str: string): TextGrid | null {

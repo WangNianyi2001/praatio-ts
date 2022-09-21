@@ -9,7 +9,7 @@ export default abstract class Tier<Denotation extends IRange<any>> {
 	abstract get type(): string;
 
 	get span() {
-		return this.textgrid ? this.textgrid.span : Infinity;
+		return this.textgrid ? this.textgrid.length : Infinity;
 	}
 
 	constructor(name: string, denotations?: Iterable<Denotation>) {

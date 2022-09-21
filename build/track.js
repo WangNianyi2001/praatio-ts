@@ -3,8 +3,11 @@ export default class Track extends Array {
     get empty() {
         return !(this.length > 0);
     }
-    get span() {
-        return this.empty ? 0 : this[this.length - 1].end;
+    get length() {
+        let max = 0;
+        for (const range of this)
+            max = Math.max(range.end, max);
+        return max;
     }
     constructor(array) {
         super();
@@ -63,7 +66,7 @@ export default class Track extends Array {
             this.push(range);
             return 0;
         }
-        const it = this.Yield(IsWithIn(new Range(range.end, this.span))).next();
+        const it = this.Yield(IsWithIn(new Range(range.end, this.length))).next();
         const index = (it.done ? this.length : it.value[0]) - 1;
         this.splice(index, 0, range);
         return index;

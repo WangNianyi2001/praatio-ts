@@ -189,7 +189,7 @@ function serializeTextgrid(tg) {
     outputTxt += 'File type = "ooTextFile"\n';
     outputTxt += 'Object class = "TextGrid"\n\n';
     outputTxt += `xmin = ${0} \n`;
-    outputTxt += `xmax = ${tg.span} \n`;
+    outputTxt += `xmax = ${tg.length} \n`;
     outputTxt += 'tiers? <exists> \n';
     outputTxt += `size = ${tg.tiers.size} \n`;
     outputTxt += 'item []: \n';
@@ -200,7 +200,7 @@ function serializeTextgrid(tg) {
         outputTxt += tab.repeat(2) + `class = "${tier.type}" \n`;
         outputTxt += tab.repeat(2) + `name = "${tier.name}" \n`;
         outputTxt += tab.repeat(2) + `xmin = ${0} \n`;
-        outputTxt += tab.repeat(2) + `xmax = ${tg.span} \n`;
+        outputTxt += tab.repeat(2) + `xmax = ${tg.length} \n`;
         switch (true) {
             case tier instanceof IntervalTier:
                 outputTxt += tab.repeat(2) + `intervals: size = ${tier.ranges.length} \n`;

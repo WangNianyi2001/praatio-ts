@@ -1,8 +1,8 @@
 import { parseTextgrid, serializeTextgrid } from './utils.js';
 export default class TextGrid {
     tiers = new Map();
-    get span() {
-        return Math.max(0, ...[...this.tiers.values()].map(tier => tier.ranges.span));
+    get length() {
+        return Math.max(0, ...[...this.tiers.values()].map(tier => tier.ranges.length));
     }
     static FromString(str) {
         return parseTextgrid(str);

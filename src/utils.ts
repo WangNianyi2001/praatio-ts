@@ -236,7 +236,7 @@ function serializeTextgrid(tg: TextGrid): string {
 	for(const tier of tg.tiers.values()) {
 		// Interval header
 		outputTxt += tab + `item [${++i}]:\n`;
-		outputTxt += tab.repeat(2) + `class = "${tier.constructor.name}" \n`;
+		outputTxt += tab.repeat(2) + `class = "${tier.type}" \n`;
 		outputTxt += tab.repeat(2) + `name = "${tier.name}" \n`;
 		outputTxt += tab.repeat(2) + `xmin = ${0} \n`;
 		outputTxt += tab.repeat(2) + `xmax = ${tg.span} \n`;

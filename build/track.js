@@ -1,4 +1,4 @@
-import { Range, Includes, IsWithIn } from './range.js';
+import { Range, IsWithIn, Overlaps } from './range.js';
 export default class Track extends Array {
     get empty() {
         return !(this.length > 0);
@@ -57,7 +57,7 @@ export default class Track extends Array {
         return !this.Yield(predicate).next().done;
     }
     Insert(range) {
-        if (!this.Any(Includes(new Range(range.start, range.end))))
+        if (this.Any(Overlaps(new Range(range.start, range.end))))
             return -1;
         if (this.empty) {
             this.push(range);

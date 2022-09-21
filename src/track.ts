@@ -1,4 +1,4 @@
-import { IRange, RangeBase, Range, Includes, IsWithIn } from './range.js';
+import { IRange, RangeBase, Range, Includes, IsWithIn, Overlaps } from './range.js';
 
 export default class Track<R extends RangeBase<any>> extends Array<R> {
 	get empty(): boolean {
@@ -63,7 +63,7 @@ export default class Track<R extends RangeBase<any>> extends Array<R> {
 	}
 
 	Insert(range: R): number {
-		if(!this.Any(Includes(new Range(range.start, range.end))))
+		if(this.Any(Overlaps(new Range(range.start, range.end))))
 			return -1;
 		if(this.empty) {
 			this.push(range);

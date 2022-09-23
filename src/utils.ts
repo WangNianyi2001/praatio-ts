@@ -241,11 +241,12 @@ function serializeTextgrid(tg: TextGrid): string {
 		outputTxt += tab.repeat(2) + `xmin = ${0} \n`;
 		outputTxt += tab.repeat(2) + `xmax = ${tg.length} \n`;
 
+		const length = tier.ranges.ranges.length;
 		switch(true) {
 			case tier instanceof IntervalTier:
-				outputTxt += tab.repeat(2) + `intervals: size = ${tier.ranges.length} \n`;
-				for(let j = 0; j < tier.ranges.length; j++) {
-					const { start, end, label } = tier.ranges[j] as Interval;
+				outputTxt += tab.repeat(2) + `intervals: size = ${length} \n`;
+				for(let j = 0; j < length; j++) {
+					const { start, end, label } = tier.ranges.AtIndex(j) as Interval;
 					outputTxt += tab.repeat(2) + `intervals [${j + 1}]:\n`;
 					outputTxt += tab.repeat(3) + `xmin = ${start} \n`;
 					outputTxt += tab.repeat(3) + `xmax = ${end} \n`;
@@ -253,9 +254,9 @@ function serializeTextgrid(tg: TextGrid): string {
 				}
 				break;
 			case tier instanceof PointTier:
-				outputTxt += tab.repeat(2) + `points: size = ${tier.ranges.length} \n`;
-				for(let j = 0; j < tier.ranges.length; j++) {
-					const { time, label } = tier.ranges[j] as Point;
+				outputTxt += tab.repeat(2) + `points: size = ${length} \n`;
+				for(let j = 0; j < length; j++) {
+					const { time, label } = tier.ranges.AtIndex(j) as Point;
 					outputTxt += tab.repeat(2) + `points [${j + 1}]:\n`;
 					outputTxt += tab.repeat(3) + `number = ${time} \n`;
 					outputTxt += tab.repeat(3) + `mark = "${label}" \n`;

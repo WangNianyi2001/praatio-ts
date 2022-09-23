@@ -4,7 +4,7 @@ export default class Track<R extends RangeBase<any>> {
 	ranges: R[] = [];
 
 	get empty(): boolean {
-		return !(this.length > 0);
+		return !(this.ranges.length > 0);
 	}
 	get length(): number {
 		let max = 0;
@@ -18,9 +18,8 @@ export default class Track<R extends RangeBase<any>> {
 	}
 
 	constructor(array?: Iterable<R>) {
-		if(!array)
-			return;
-		this.ranges.push(...array);
+		if(array)
+			this.ranges.push(...array);
 	}
 	Copy(): Track<R> {
 		return new Track<R>(this.ranges.map(range => range.Copy()));
@@ -33,24 +32,22 @@ export default class Track<R extends RangeBase<any>> {
 		return this.First(range => range.Includes(new Range(time, time)));
 	}
 	AtIndex(index: number): R | null {
-		if(
-			index < 0 || index >= this.length ||
-			Math.floor(index) != index
-		) return null;
-		return this[index];
+		if(index < 0 || index >= this.ranges.length)
+			return null;
+		return this.ranges[Math.floor(index)];
 	}
 
 	*Yield(predicate: (range: R) => boolean): Generator<[number, R]> {
-		for(let index = 0; index < this.length; ++index) {
-			const range = this[index];
+		for(let index = 0; index < this.ranges.length; ++index) {
+			const range = this.ranges[index];
 			if(predicate(range))
 				yield [index, range];
 		}
 	}
 	*ReverseYield(predicate: (range: R) => boolean): Generator<[number, R]> {
-		for(let index = this.length - 1; index > 0; ) {
+		for(let index = this.ranges.length - 1; index > 0; ) {
 			--index;
-			const range = this[index];
+			const range = this.ranges[index];
 			if(predicate(range))
 				yield [index, range];
 		}
@@ -75,7 +72,7 @@ export default class Track<R extends RangeBase<any>> {
 			return 0;
 		}
 		const it = this.Yield(IsWithIn(new Range(range.end, this.length))).next();
-		const index = (it.done ? this.length : it.value[0]) - 1;
+		const index = (it.done ? this.ranges.length : it.value[0]) - 1;
 		this.ranges.splice(index, 0, range);
 		return index;
 	}

@@ -2,7 +2,7 @@ import { Range, IsWithIn, Overlaps } from './range.js';
 export default class Track {
     ranges = [];
     get empty() {
-        return !(this.length > 0);
+        return !(this.ranges.length > 0);
     }
     get length() {
         let max = 0;
@@ -14,9 +14,8 @@ export default class Track {
         return this.ranges.values();
     }
     constructor(array) {
-        if (!array)
-            return;
-        this.ranges.push(...array);
+        if (array)
+            this.ranges.push(...array);
     }
     Copy() {
         return new Track(this.ranges.map(range => range.Copy()));
@@ -28,22 +27,21 @@ export default class Track {
         return this.First(range => range.Includes(new Range(time, time)));
     }
     AtIndex(index) {
-        if (index < 0 || index >= this.length ||
-            Math.floor(index) != index)
+        if (index < 0 || index >= this.ranges.length)
             return null;
-        return this[index];
+        return this.ranges[Math.floor(index)];
     }
     *Yield(predicate) {
-        for (let index = 0; index < this.length; ++index) {
-            const range = this[index];
+        for (let index = 0; index < this.ranges.length; ++index) {
+            const range = this.ranges[index];
             if (predicate(range))
                 yield [index, range];
         }
     }
     *ReverseYield(predicate) {
-        for (let index = this.length - 1; index > 0;) {
+        for (let index = this.ranges.length - 1; index > 0;) {
             --index;
-            const range = this[index];
+            const range = this.ranges[index];
             if (predicate(range))
                 yield [index, range];
         }
@@ -67,7 +65,7 @@ export default class Track {
             return 0;
         }
         const it = this.Yield(IsWithIn(new Range(range.end, this.length))).next();
-        const index = (it.done ? this.length : it.value[0]) - 1;
+        const index = (it.done ? this.ranges.length : it.value[0]) - 1;
         this.ranges.splice(index, 0, range);
         return index;
     }

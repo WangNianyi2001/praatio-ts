@@ -6,7 +6,7 @@ export default abstract class Tier<Denotation extends IRange<any>> {
     ranges: Track<Denotation>;
     textgrid: TextGrid | null;
     abstract get type(): string;
-    get span(): number;
+    get length(): number;
     constructor(name: string, denotations?: Iterable<Denotation>);
     abstract Copy(): Tier<Denotation>;
 }

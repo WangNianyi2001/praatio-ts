@@ -1,6 +1,8 @@
 import { IRange, RangeBase, Range, Includes, IsWithIn, Overlaps } from './range.js';
 
-export default class Track<R extends RangeBase<any>> extends Array<R> {
+export default class Track<R extends RangeBase<any>> {
+	ranges: R[] = [];
+
 	get empty(): boolean {
 		return !(this.length > 0);
 	}
@@ -11,21 +13,21 @@ export default class Track<R extends RangeBase<any>> extends Array<R> {
 		return max;
 	}
 
+	[Symbol.iterator](): Iterator<R> {
+		return this.ranges.values();
+	}
+
 	constructor(array?: Iterable<R>) {
-		super();
 		if(!array)
 			return;
-		this.push(...array);
+		this.ranges.push(...array);
 	}
 	Copy(): Track<R> {
-		return new Track<R>(this.map(range => range.Copy()));
-	}
-	slice(): Array<R> {
-		return Array.from(this).slice(...arguments);
+		return new Track<R>(this.ranges.map(range => range.Copy()));
 	}
 
 	IndexOf(denotation: R): number {
-		return this.indexOf(denotation);
+		return this.ranges.indexOf(denotation);
 	}
 	At(time: number): R | null {
 		return this.First(range => range.Includes(new Range(time, time)));
@@ -38,14 +40,14 @@ export default class Track<R extends RangeBase<any>> extends Array<R> {
 		return this[index];
 	}
 
-	*Yield(predicate: (range: IRange<any>) => boolean): Generator<[number, R]> {
+	*Yield(predicate: (range: R) => boolean): Generator<[number, R]> {
 		for(let index = 0; index < this.length; ++index) {
 			const range = this[index];
 			if(predicate(range))
 				yield [index, range];
 		}
 	}
-	*ReverseYield(predicate: (range: IRange<any>) => boolean): Generator<[number, R]> {
+	*ReverseYield(predicate: (range: R) => boolean): Generator<[number, R]> {
 		for(let index = this.length - 1; index > 0; ) {
 			--index;
 			const range = this[index];
@@ -53,15 +55,15 @@ export default class Track<R extends RangeBase<any>> extends Array<R> {
 				yield [index, range];
 		}
 	}
-	First(predicate: (range: IRange<any>) => boolean): R | null {
+	First(predicate: (range: R) => boolean): R | null {
 		const it = this.Yield(predicate).next();
 		return it.done ? null : it.value[1];
 	}
-	Last(predicate: (range: IRange<any>) => boolean): R | null {
+	Last(predicate: (range: R) => boolean): R | null {
 		const it = this.ReverseYield(predicate).next();
 		return it.done ? null : it.value[1];
 	}
-	Any(predicate: (range: IRange<any>) => boolean): boolean {
+	Any(predicate: (range: R) => boolean): boolean {
 		return !this.Yield(predicate).next().done;
 	}
 
@@ -69,19 +71,19 @@ export default class Track<R extends RangeBase<any>> extends Array<R> {
 		if(this.Any(Overlaps(new Range(range.start, range.end))))
 			return -1;
 		if(this.empty) {
-			this.push(range);
+			this.ranges.push(range);
 			return 0;
 		}
 		const it = this.Yield(IsWithIn(new Range(range.end, this.length))).next();
 		const index = (it.done ? this.length : it.value[0]) - 1;
-		this.splice(index, 0, range);
+		this.ranges.splice(index, 0, range);
 		return index;
 	}
 	Remove(range: R): number {
 		const index = this.IndexOf(range);
 		if(index === -1)
 			return -1;
-		this.splice(index, 1);
+		this.ranges.splice(index, 1);
 		return index;
 	}
 	Adjust(range: R, target: IRange<any>): boolean {

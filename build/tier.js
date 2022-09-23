@@ -3,7 +3,7 @@ export default class Tier {
     name;
     ranges = new Track();
     textgrid;
-    get span() {
+    get length() {
         return this.textgrid ? this.textgrid.length : Infinity;
     }
     constructor(name, denotations) {

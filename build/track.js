@@ -1,5 +1,6 @@
 import { Range, IsWithIn, Overlaps } from './range.js';
-export default class Track extends Array {
+export default class Track {
+    ranges = [];
     get empty() {
         return !(this.length > 0);
     }
@@ -9,20 +10,19 @@ export default class Track extends Array {
             max = Math.max(range.end, max);
         return max;
     }
+    [Symbol.iterator]() {
+        return this.ranges.values();
+    }
     constructor(array) {
-        super();
         if (!array)
             return;
-        this.push(...array);
+        this.ranges.push(...array);
     }
     Copy() {
-        return new Track(this.map(range => range.Copy()));
-    }
-    slice() {
-        return Array.from(this).slice(...arguments);
+        return new Track(this.ranges.map(range => range.Copy()));
     }
     IndexOf(denotation) {
-        return this.indexOf(denotation);
+        return this.ranges.indexOf(denotation);
     }
     At(time) {
         return this.First(range => range.Includes(new Range(time, time)));
@@ -63,19 +63,19 @@ export default class Track extends Array {
         if (this.Any(Overlaps(new Range(range.start, range.end))))
             return -1;
         if (this.empty) {
-            this.push(range);
+            this.ranges.push(range);
             return 0;
         }
         const it = this.Yield(IsWithIn(new Range(range.end, this.length))).next();
         const index = (it.done ? this.length : it.value[0]) - 1;
-        this.splice(index, 0, range);
+        this.ranges.splice(index, 0, range);
         return index;
     }
     Remove(range) {
         const index = this.IndexOf(range);
         if (index === -1)
             return -1;
-        this.splice(index, 1);
+        this.ranges.splice(index, 1);
         return index;
     }
     Adjust(range, target) {

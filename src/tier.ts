@@ -8,7 +8,7 @@ export default abstract class Tier<Denotation extends IRange<any>> {
 	textgrid: TextGrid | null;
 	abstract get type(): string;
 
-	get span() {
+	get length() {
 		return this.textgrid ? this.textgrid.length : Infinity;
 	}
 

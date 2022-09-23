@@ -17,9 +17,16 @@ export default class Track<R extends RangeBase<any>> {
 		return this.ranges.values();
 	}
 
-	constructor(array?: Iterable<R>) {
-		if(array)
-			this.ranges.push(...array);
+	constructor(array: Iterable<R> = []) {
+		this.ranges.push(...array);
+		// Sort by start time
+		this.ranges.sort((a, b) => a.start - b.start);
+		// Check for overlapsing intervals
+		for(let i = 1; i < this.ranges.length; ++i) {
+			const [before, range] = [this.ranges[i - 1], this.ranges[i]];
+			if(before.end > range.start)
+				throw `Ranges overlap with each other`;
+		}
 	}
 	Copy(): Track<R> {
 		return new Track<R>(this.ranges.map(range => range.Copy()));

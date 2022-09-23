@@ -13,9 +13,16 @@ export default class Track {
     [Symbol.iterator]() {
         return this.ranges.values();
     }
-    constructor(array) {
-        if (array)
-            this.ranges.push(...array);
+    constructor(array = []) {
+        this.ranges.push(...array);
+        // Sort by start time
+        this.ranges.sort((a, b) => a.start - b.start);
+        // Check for overlapsing intervals
+        for (let i = 1; i < this.ranges.length; ++i) {
+            const [before, range] = [this.ranges[i - 1], this.ranges[i]];
+            if (before.end > range.start)
+                throw `Ranges overlap with each other`;
+        }
     }
     Copy() {
         return new Track(this.ranges.map(range => range.Copy()));

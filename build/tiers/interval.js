@@ -15,10 +15,9 @@ export class Interval extends RangeBase {
     }
 }
 export default class IntervalTier extends Tier {
-    get intervals() { return this.ranges; }
     get type() { return 'IntervalTier'; }
     Copy() {
-        const copy = new IntervalTier(this.name, this.intervals.Copy());
+        const copy = new IntervalTier(this.name, this.Copy());
         return copy;
     }
 }

@@ -2,7 +2,7 @@ import { parseTextgrid, serializeTextgrid } from './utils.js';
 export default class TextGrid {
     tiers = new Map();
     get length() {
-        return Math.max(0, ...[...this.tiers.values()].map(tier => tier.ranges.length));
+        return Math.max(0, ...[...this.tiers.values()].map(tier => tier.length));
     }
     static FromString(str) {
         return parseTextgrid(str);

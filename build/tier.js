@@ -1,13 +1,9 @@
 import Track from './track.js';
-export default class Tier {
+export default class Tier extends Track {
     name;
-    ranges = new Track();
     textgrid;
-    get length() {
-        return this.textgrid ? this.textgrid.length : Infinity;
-    }
     constructor(name, ranges) {
+        super(ranges);
         this.name = name;
-        this.ranges = new Track(ranges);
     }
 }

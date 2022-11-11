@@ -17,10 +17,9 @@ export class Point extends RangeBase {
     }
 }
 export default class PointTier extends Tier {
-    get points() { return this.ranges; }
     get type() { return 'PointTier'; }
     Copy() {
-        const copy = new PointTier(this.name, this.points.Copy());
+        const copy = new PointTier(this.name, this.Copy());
         return copy;
     }
 }

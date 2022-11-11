@@ -154,7 +154,7 @@ function parseShortTextgrid(data) {
         // let tierType = null;
         let endTimeI = null;
         let labelI = null;
-        const denotations = [];
+        const ranges = [];
         if (isInterval) {
             while (true) {
                 [startTime, endTimeI] = fetchRow(tierData, '', startTimeI);
@@ -163,9 +163,9 @@ function parseShortTextgrid(data) {
                 [endTime, labelI] = fetchRow(tierData, '', endTimeI);
                 [label, startTimeI] = fetchRow(tierData, '', labelI);
                 label = label.trim();
-                denotations.push([startTime, endTime, label]);
+                ranges.push([startTime, endTime, label]);
             }
-            tier = new IntervalTier(tierName, denotations);
+            tier = new IntervalTier(tierName, ranges);
         }
         else {
             while (true) {
@@ -174,9 +174,9 @@ function parseShortTextgrid(data) {
                     break;
                 [label, startTimeI] = fetchRow(tierData, '', labelI);
                 label = label.trim();
-                denotations.push([startTime, label]);
+                ranges.push([startTime, label]);
             }
-            tier = new PointTier(tierName, denotations);
+            tier = new PointTier(tierName, ranges);
         }
         textgrid.Add(tier);
     }

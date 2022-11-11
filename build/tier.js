@@ -6,8 +6,8 @@ export default class Tier {
     get length() {
         return this.textgrid ? this.textgrid.length : Infinity;
     }
-    constructor(name, denotations) {
+    constructor(name, ranges) {
         this.name = name;
-        this.ranges = new Track(denotations);
+        this.ranges = new Track(ranges);
     }
 }

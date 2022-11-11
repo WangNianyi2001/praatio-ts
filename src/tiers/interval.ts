@@ -18,11 +18,10 @@ export class Interval extends RangeBase<Interval> {
 }
 
 export default class IntervalTier extends Tier<Interval> {
-	get intervals() { return this.ranges; }
 	get type() { return 'IntervalTier'; }
 
 	override Copy(): IntervalTier {
-		const copy = new IntervalTier(this.name, this.intervals.Copy());
+		const copy = new IntervalTier(this.name, this.Copy());
 		return copy;
 	}
 }

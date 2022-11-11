@@ -2,19 +2,14 @@ import { IRange } from './range.js';
 import Track from './track.js';
 import TextGrid from './textgrid.js';
 
-export default abstract class Tier<Denotation extends IRange<any>> {
+export default abstract class Tier<Range extends IRange<any>> extends Track<Range> {
 	name: string;
-	ranges = new Track<Denotation>();
 	textgrid: TextGrid | null;
 	abstract get type(): string;
 
-	get length() {
-		return this.textgrid ? this.textgrid.length : Infinity;
-	}
-
-	constructor(name: string, denotations?: Iterable<Denotation>) {
+	constructor(name: string, ranges?: Iterable<Range>) {
+		super(ranges);
 		this.name = name;
-		this.ranges = new Track<Denotation>(denotations);
 	}
-	abstract Copy(): Tier<Denotation>;
+	abstract Copy(): Tier<Range>;
 }

@@ -27,8 +27,8 @@ export default class Track {
     Copy() {
         return new Track(this.ranges.map(range => range.Copy()));
     }
-    IndexOf(denotation) {
-        return this.ranges.indexOf(denotation);
+    IndexOf(range) {
+        return this.ranges.indexOf(range);
     }
     At(time) {
         return this.First(range => range.Includes(new Range(time, time)));

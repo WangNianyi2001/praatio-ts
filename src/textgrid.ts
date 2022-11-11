@@ -7,7 +7,7 @@ export default class TextGrid {
 	tiers = new Map<string, Tier<IRange<any>>>();
 
 	get length(): number {
-		return Math.max(0, ...[...this.tiers.values()].map(tier => tier.ranges.length));
+		return Math.max(0, ...[...this.tiers.values()].map(tier => tier.length));
 	}
 
 	static FromString(str: string): TextGrid | null {

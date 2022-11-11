@@ -1,4 +1,4 @@
-import { IRange, RangeBase, Range, Includes, IsWithIn, Overlaps } from './range.js';
+import { IRange, RangeBase, Range, IsWithIn, Overlaps } from './range.js';
 
 export default class Track<R extends RangeBase<any>> {
 	ranges: R[] = [];
@@ -32,8 +32,8 @@ export default class Track<R extends RangeBase<any>> {
 		return new Track<R>(this.ranges.map(range => range.Copy()));
 	}
 
-	IndexOf(denotation: R): number {
-		return this.ranges.indexOf(denotation);
+	IndexOf(range: R): number {
+		return this.ranges.indexOf(range);
 	}
 	At(time: number): R | null {
 		return this.First(range => range.Includes(new Range(time, time)));

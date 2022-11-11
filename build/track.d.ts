@@ -6,7 +6,7 @@ export default class Track<R extends RangeBase<any>> {
     [Symbol.iterator](): Iterator<R>;
     constructor(array?: Iterable<R>);
     Copy(): Track<R>;
-    IndexOf(denotation: R): number;
+    IndexOf(range: R): number;
     At(time: number): R | null;
     AtIndex(index: number): R | null;
     Yield(predicate: (range: R) => boolean): Generator<[number, R]>;

@@ -21,11 +21,10 @@ export class Point extends RangeBase<Point> {
 }
 
 export default class PointTier extends Tier<Point> {
-	get points() { return this.ranges; }
 	get type() { return 'PointTier'; }
 
 	override Copy(): PointTier {
-		const copy = new PointTier(this.name, this.points.Copy());
+		const copy = new PointTier(this.name, this.Copy());
 		return copy;
 	}
 }

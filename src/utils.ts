@@ -187,7 +187,7 @@ function parseShortTextgrid(data: string): TextGrid | null {
 		let endTimeI = null;
 		let labelI = null;
 
-		const denotations = [];
+		const ranges = [];
 		if(isInterval) {
 			while(true) {
 				[startTime, endTimeI] = fetchRow(tierData, '', startTimeI);
@@ -197,9 +197,9 @@ function parseShortTextgrid(data: string): TextGrid | null {
 				[label, startTimeI] = fetchRow(tierData, '', labelI);
 
 				label = label.trim();
-				denotations.push([startTime, endTime, label]);
+				ranges.push([startTime, endTime, label]);
 			}
-			tier = new IntervalTier(tierName, denotations);
+			tier = new IntervalTier(tierName, ranges);
 		} else {
 			while(true) {
 				[startTime, labelI] = fetchRow(tierData, '', startTimeI);
@@ -208,9 +208,9 @@ function parseShortTextgrid(data: string): TextGrid | null {
 				[label, startTimeI] = fetchRow(tierData, '', labelI);
 
 				label = label.trim();
-				denotations.push([startTime, label]);
+				ranges.push([startTime, label]);
 			}
-			tier = new PointTier(tierName, denotations);
+			tier = new PointTier(tierName, ranges);
 		}
 		textgrid.Add(tier);
 	}
@@ -241,12 +241,12 @@ function serializeTextgrid(tg: TextGrid): string {
 		outputTxt += tab.repeat(2) + `xmin = ${0} \n`;
 		outputTxt += tab.repeat(2) + `xmax = ${tg.length} \n`;
 
-		const length = tier.ranges.ranges.length;
+		const length = tier.length;
 		switch(true) {
 			case tier instanceof IntervalTier:
 				outputTxt += tab.repeat(2) + `intervals: size = ${length} \n`;
 				for(let j = 0; j < length; j++) {
-					const { start, end, label } = tier.ranges.AtIndex(j) as Interval;
+					const { start, end, label } = tier.AtIndex(j) as Interval;
 					outputTxt += tab.repeat(2) + `intervals [${j + 1}]:\n`;
 					outputTxt += tab.repeat(3) + `xmin = ${start} \n`;
 					outputTxt += tab.repeat(3) + `xmax = ${end} \n`;
@@ -256,7 +256,7 @@ function serializeTextgrid(tg: TextGrid): string {
 			case tier instanceof PointTier:
 				outputTxt += tab.repeat(2) + `points: size = ${length} \n`;
 				for(let j = 0; j < length; j++) {
-					const { time, label } = tier.ranges.AtIndex(j) as Point;
+					const { time, label } = tier.AtIndex(j) as Point;
 					outputTxt += tab.repeat(2) + `points [${j + 1}]:\n`;
 					outputTxt += tab.repeat(3) + `number = ${time} \n`;
 					outputTxt += tab.repeat(3) + `mark = "${label}" \n`;

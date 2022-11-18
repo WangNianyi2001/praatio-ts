@@ -78,12 +78,12 @@ export default class Track {
     /** Find the first range satisfying the predicate. */
     First(predicate) {
         const it = this.Yield(predicate).next();
-        return it.done ? null : it.value[1];
+        return it.done ? null : it.value;
     }
     /** Find the last range satisfying the predicate. */
     Last(predicate) {
         const it = this.ReverseYield(predicate).next();
-        return it.done ? null : it.value[1];
+        return it.done ? null : it.value;
     }
     /** Check if there is any range satisfies the predicate. */
     Any(predicate) {

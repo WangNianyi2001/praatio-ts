@@ -86,12 +86,12 @@ export default class Track<R extends RangeBase<any>> {
 	/** Find the first range satisfying the predicate. */
 	First(predicate: (range: R) => boolean): R | null {
 		const it = this.Yield(predicate).next();
-		return it.done ? null : it.value[1];
+		return it.done ? null : it.value;
 	}
 	/** Find the last range satisfying the predicate. */
 	Last(predicate: (range: R) => boolean): R | null {
 		const it = this.ReverseYield(predicate).next();
-		return it.done ? null : it.value[1];
+		return it.done ? null : it.value;
 	}
 	/** Check if there is any range satisfies the predicate. */
 	Any(predicate: (range: R) => boolean): boolean {

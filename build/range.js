@@ -20,8 +20,20 @@ export class RangeBase {
     }
 }
 export class Range extends RangeBase {
-    start;
-    end;
+    #start;
+    #end;
+    get start() { return this.#start; }
+    set start(value) {
+        this.#start = value;
+        if (this.#start > this.#end)
+            [this.#start, this.#end] = [this.#end, this.#start];
+    }
+    get end() { return this.#end; }
+    set end(value) {
+        this.#end = value;
+        if (this.#start > this.#end)
+            [this.#start, this.#end] = [this.#end, this.#start];
+    }
     constructor(start, end) {
         super();
         [this.start, this.end] = [+start, +end];

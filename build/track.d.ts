@@ -6,7 +6,9 @@ export default class Track<R extends RangeBase<any>> {
     [Symbol.iterator](): Iterator<R>;
     constructor(array?: Iterable<R>);
     Copy(): Track<R>;
-    /** Public methods */
+    /** Public interfaces */
+    /** Sort ranges in track by start time. */
+    Sort(): void;
     /**
      * Find the index of certain range in track.
      * @returns -1 if not found.

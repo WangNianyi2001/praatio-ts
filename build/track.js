@@ -20,9 +20,7 @@ export default class Track {
     //#region Constructors
     constructor(array = []) {
         this.ranges.push(...array);
-        // Sort by start time
-        this.ranges.sort((a, b) => a.start - b.start);
-        // Check for overlapsing intervals
+        this.Sort();
         for (let i = 1; i < this.ranges.length; ++i) {
             const [before, range] = [this.ranges[i - 1], this.ranges[i]];
             if (before.end > range.start)
@@ -33,7 +31,13 @@ export default class Track {
         return new Track(this.ranges.map(range => range.Copy()));
     }
     //#endregion
-    /** Public methods */
+    /** Public interfaces */
+    //#region Auxiliary
+    /** Sort ranges in track by start time. */
+    Sort() {
+        this.ranges.sort((a, b) => a.start - b.start);
+    }
+    //#endregion
     //#region Indexing
     /**
      * Find the index of certain range in track.
@@ -123,6 +127,7 @@ export default class Track {
         if (this.Any(obj => obj !== range && obj.Overlaps(target)))
             return false;
         [range.start, range.end] = [target.start, target.end];
+        this.Sort();
         return true;
     }
     /**

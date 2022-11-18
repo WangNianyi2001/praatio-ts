@@ -47,8 +47,22 @@ export abstract class RangeBase<Impl extends RangeBase<Impl>> implements IRange<
 }
 
 export class Range extends RangeBase<Range> {
-	start: number;
-	end: number;
+	#start: number;
+	#end: number;
+
+	get start(): number { return this.#start; }
+	set start(value: number) {
+		this.#start = value;
+		if(this.#start > this.#end)
+			[this.#start, this.#end] = [this.#end, this.#start];
+	}
+
+	get end(): number { return this.#end; }
+	set end(value: number) {
+		this.#end = value;
+		if(this.#start > this.#end)
+			[this.#start, this.#end] = [this.#end, this.#start];
+	}
 
 	constructor(start: number, end: number) {
 		super();

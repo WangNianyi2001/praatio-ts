@@ -24,8 +24,11 @@ export declare abstract class RangeBase<Impl extends RangeBase<Impl>> implements
     Includes(range: IRange<any>): boolean;
 }
 export declare class Range extends RangeBase<Range> {
-    start: number;
-    end: number;
+    #private;
+    get start(): number;
+    set start(value: number);
+    get end(): number;
+    set end(value: number);
     constructor(start: number, end: number);
     Copy(): Range;
 }

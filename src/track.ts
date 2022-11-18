@@ -4,6 +4,7 @@ export default class Track<R extends RangeBase<any>> {
 	//#region Core fields
 	readonly ranges: R[] = [];
 	//#endregion
+
 	//#region Properties
 	get empty(): boolean {
 		return !(this.ranges.length > 0);
@@ -18,12 +19,11 @@ export default class Track<R extends RangeBase<any>> {
 		return this.ranges.values();
 	}
 	//#endregion
+
 	//#region Constructors
 	constructor(array: Iterable<R> = []) {
 		this.ranges.push(...array);
-		// Sort by start time
-		this.ranges.sort((a, b) => a.start - b.start);
-		// Check for overlapsing intervals
+		this.Sort();
 		for(let i = 1; i < this.ranges.length; ++i) {
 			const [before, range] = [this.ranges[i - 1], this.ranges[i]];
 			if(before.end > range.start)
@@ -34,7 +34,16 @@ export default class Track<R extends RangeBase<any>> {
 		return new Track<R>(this.ranges.map(range => range.Copy()));
 	}
 	//#endregion
-	/** Public methods */
+
+	/** Public interfaces */
+
+	//#region Auxiliary
+	/** Sort ranges in track by start time. */
+	Sort(): void {
+		this.ranges.sort((a, b) => a.start - b.start);
+	}
+	//#endregion
+
 	//#region Indexing
 	/**
 	 * Find the index of certain range in track.
@@ -57,6 +66,7 @@ export default class Track<R extends RangeBase<any>> {
 		return this.ranges[Math.floor(index)];
 	}
 	//#endregion
+
 	//#region Traversing & yielding
 	/** Yield all ranges in order by predicate. */
 	*Yield(predicate: (range: R) => boolean): Generator<R> {
@@ -71,6 +81,7 @@ export default class Track<R extends RangeBase<any>> {
 				yield range;
 	}
 	//#endregion
+
 	//#region Querying
 	/** Find the first range satisfying the predicate. */
 	First(predicate: (range: R) => boolean): R | null {
@@ -87,6 +98,7 @@ export default class Track<R extends RangeBase<any>> {
 		return !this.Yield(predicate).next().done;
 	}
 	//#endregion
+
 	//#region Range operations
 	/**
 	 * Insert a range into track.
@@ -124,6 +136,7 @@ export default class Track<R extends RangeBase<any>> {
 		if(this.Any(obj => obj !== range && obj.Overlaps(target)))
 			return false;
 		[range.start, range.end] = [target.start, target.end];
+		this.Sort();
 		return true;
 	}
 	/**

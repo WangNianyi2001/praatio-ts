@@ -103,7 +103,7 @@ export default class Track {
             return 0;
         }
         const it = this.Yield(IsWithIn(new Range(range.end, this.length))).next();
-        const index = (it.done ? this.ranges.length : it.value[0]) - 1;
+        const index = (it.done ? this.ranges.length : this.IndexOf(it.value)) - 1;
         this.ranges.splice(index, 0, range);
         return index;
     }

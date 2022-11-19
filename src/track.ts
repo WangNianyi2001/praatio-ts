@@ -111,8 +111,8 @@ export default class Track<R extends RangeBase<any>> {
 			this.ranges.push(range);
 			return 0;
 		}
-		const it = this.Yield(IsWithIn(new Range(range.end, this.length))).next();
-		const index = (it.done ? this.ranges.length : this.IndexOf(it.value)) - 1;
+		const firstAfter = this.First(IsWithIn(new Range(range.end, this.length)));
+		const index = firstAfter ? this.IndexOf(firstAfter) : this.ranges.length;
 		this.ranges.splice(index, 0, range);
 		return index;
 	}

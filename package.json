@@ -1,6 +1,6 @@
 {
 	"name": "@nianyi-wang/textgrid-js",
-	"version": "1.0.7",
+	"version": "1.0.8",
 	"description": "Manipulate Praat textgrid with NodeJS.",
 	"type": "module",
 	"scripts": {

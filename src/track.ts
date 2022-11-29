@@ -107,14 +107,9 @@ export default class Track<R extends RangeBase<any>> {
 	Insert(range: R): number {
 		if(this.Any(Overlaps(new Range(range.start, range.end))))
 			return -1;
-		if(this.empty) {
-			this.ranges.push(range);
-			return 0;
-		}
-		const firstAfter = this.First(IsWithIn(new Range(range.end, this.length)));
-		const index = firstAfter ? this.IndexOf(firstAfter) : this.ranges.length;
-		this.ranges.splice(index, 0, range);
-		return index;
+		this.ranges.push(range);
+		this.Sort();
+		return this.IndexOf(range);
 	}
 	/**
 	 * Removes a range from track.

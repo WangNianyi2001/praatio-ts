@@ -241,7 +241,7 @@ function serializeTextgrid(tg: TextGrid): string {
 		outputTxt += tab.repeat(2) + `xmin = ${0} \n`;
 		outputTxt += tab.repeat(2) + `xmax = ${tg.length} \n`;
 
-		const length = tier.length;
+		const length = tier.ranges.length;
 		switch(true) {
 			case tier instanceof IntervalTier:
 				outputTxt += tab.repeat(2) + `intervals: size = ${length} \n`;

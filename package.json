@@ -1,7 +1,7 @@
 {
-	"name": "@nianyi-wang/textgrid-js",
-	"version": "1.0.9",
-	"description": "Manipulate Praat textgrid with NodeJS.",
+	"name": "@nianyi-wang/textgrid",
+	"version": "1.0.0",
+	"description": "Manipulate Praat textgrid with NodeJS",
 	"type": "module",
 	"scripts": {
 		"build": "npx tsc"
@@ -21,9 +21,9 @@
 	"bugs": {
 		"url": "https://github.com/WangNianyi2001/textgrid-js/issues"
 	},
-	"main": "build/index.js",
-	"types": "build/index.d.ts",
-	"files": ["build"],
+	"main": "./build/index.js",
+	"types": "./build/index.d.ts",
+	"files": ["./build"],
 	"homepage": "https://github.com/WangNianyi2001/textgrid-js",
 	"devDependencies": {
 		"@types/node": "^18.7.16",
